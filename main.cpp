@@ -1,12 +1,12 @@
 #include <fstream>
 #include <iostream>
 #include <vector>
+#include <sstream>
 
 #include "citation.h"
 #include "utils.hpp"
 
 #include "third_parties/nlohmann/json.hpp"
-#include "third_parties/cpp-httplib/httplib.h"
 
 std::vector<Citation *> loadCitations(const std::string &filename)
 {
@@ -32,10 +32,49 @@ std::vector<Citation *> loadCitations(const std::string &filename)
             cite=new Article(id,article,author,title,journal,year,volume,issue);
         }
         c.push_back(cite);
+        
     }
     return c;
 }
-
+std::string readFromFile(const std::string& filename){
+    std::ifstream file(filename);
+    std::string s;
+    char x;
+    while(file.get(x))
+        s += x;
+    return s;
+}
+void output_idx(std::vector<Citation*>&c,const std::string& input,const
+std::vector<Citation *>& citations){
+    std::vector<std::string>idxes;
+    char x;
+    std::string id;
+    std::istringstream input_stream(input);
+    bool flag=0;
+    while(input_stream.get(x)){
+        if(x=='['){
+            flag=1;
+            id="";
+            continue;
+        }
+        if(x==']'){
+            if(flag){
+                flag=0;
+                idxes.push_back(id);
+            }
+            else std::exit(1);//无匹配的左括号
+            continue;
+        }
+        id+=x;
+    }
+    if(flag==1)
+        std::exit(1);//无匹配的右括号
+    std::sort(idxes.begin(),idxes.end());
+    for(auto i:idxes)
+        for(auto cite:citations)
+            if(cite->id==i)
+                c.push_back(cite);
+}
 int main(int argc, char **argv)
 {
     // "docman", "-c", "citations.json", "input.txt"
@@ -46,15 +85,20 @@ int main(int argc, char **argv)
     // FIXME: read all input to the string, and process citations in the input text
     // auto input = readFromFile(argv[3]);
     // ...
+    auto input=readFromFile(argv[3]);
+    output_idx(printedCitations,input,citations);
 
     std::ostream &output = std::cout;
 
     // output << input;  // print the paragraph first
     // output << "\nReferences:\n";
+    output<<input;
+    output<<"\nReferences:\n";
 
     for (auto c : printedCitations)
     {
         // FIXME: print citation
+        c->printCitation();
     }
 
     for (auto c : citations)
