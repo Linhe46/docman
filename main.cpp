@@ -17,22 +17,21 @@ std::vector<Citation *> loadCitations(const std::string &filename)
     for(auto& item:data["citations"]){
         auto id=item["id"].get<std::string>();
         auto type=item["type"].get<std::string>();
-        Citation* cite;
+        Citation* cite=nullptr;
         if(type=="book")
                 cite=new Book(id,book,item["isbn"].get<std::string>());
         else if(type=="webpage")
-                cite=new Book(id,webpage,item["url"].get<std::string>());
+                cite=new Webpage(id,webpage,item["url"].get<std::string>());
         else if(type=="article"){
             auto author=item["author"].get<std::string>();
             auto title=item["title"].get<std::string>();
             auto journal=item["journal"].get<std::string>();
             auto year=std::to_string(item["year"].get<int>());
-            auto volume=item["volume"].get<std::string>();
-            auto issue=item["issue"].get<std::string>();
+            auto volume=std::to_string(item["volume"].get<int>());
+            auto issue=std::to_string(item["issue"].get<int>());
             cite=new Article(id,article,author,title,journal,year,volume,issue);
         }
         c.push_back(cite);
-        
     }
     return c;
 }
@@ -92,7 +91,7 @@ int main(int argc, char **argv)
 
     // output << input;  // print the paragraph first
     // output << "\nReferences:\n";
-    output<<input;
+    output<<input<<"\n";
     output<<"\nReferences:\n";
 
     for (auto c : printedCitations)
@@ -106,3 +105,5 @@ int main(int argc, char **argv)
         delete c;
     }
 }
+//./main -c source.json article.txt
+//g++ main.cpp -o main -lws2_32

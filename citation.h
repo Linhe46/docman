@@ -5,6 +5,7 @@
 #include <string>
 
 #include "third_parties/cpp-httplib/httplib.h"
+#include "third_parties/nlohmann/json.hpp"
 #include "utils.hpp"
 
 enum Type
@@ -34,10 +35,10 @@ public:
         auto result=client.Get("/isbn/"+encodeUriComponent(isbn));
         if(result&&result->status==httplib::OK_200){
             nlohmann::json data=nlohmann::json::parse(result->body);
-            auto author_ = data["author"].get<std::string>();
-            auto title_ = data["title"].get<std::string>();
-            auto publisher_ = data["publisher"].get<std::string>();
-            auto year_ = data["year"].get<std::string>();
+            author = data["author"].get<std::string>();
+            title = data["title"].get<std::string>();
+            publisher = data["publisher"].get<std::string>();
+            year = data["year"].get<std::string>();
         }
         else{
             auto err=result.error();
@@ -54,12 +55,11 @@ class Webpage : public Citation{
     std::string title;
 public:
     Webpage(std::string id_, Type type_, std::string url_) : Citation(id_, type_), url(url_) {get();}
-    void get()override{
+    void get() override{
         auto result=client.Get("/title/"+encodeUriComponent(url));
         if(result&&result->status==httplib::OK_200){
             nlohmann::json data=nlohmann::json::parse(result->body);
-            auto title_ = data["title"].get<std::string>();
-            title=title_;
+            title = data["title"].get<std::string>();
         }
         else{
             auto err=result.error();
