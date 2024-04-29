@@ -4,7 +4,22 @@
 
 #include <string>
 
-class Citation {
+enum Type
+{
+    book,
+    webpage,
+    article
 };
 
+class Citation
+{
+    Type type;
+};
+class Citation_web
+{
+    std::string s;
+};
+class Article : public Citation
+{
+};
 #endif
