@@ -7,28 +7,48 @@
 #include "utils.hpp"
 
 #include "third_parties/nlohmann/json.hpp"
-
 std::vector<Citation *> loadCitations(const std::string &filename)
 {
     // FIXME: load citations from file
     std::vector<Citation*>c;
     std::ifstream file{filename};
     nlohmann::json data=nlohmann::json::parse(file);
+    if(data["citations"].is_null())
+        std::exit(1);
     for(auto& item:data["citations"]){
+        if(item["id"].is_null()||!item["id"].is_string())std::exit(1);
         auto id=item["id"].get<std::string>();
+        if(item["type"].is_null()||!item["type"].is_string())std::exit(1);
         auto type=item["type"].get<std::string>();
+
         Citation* cite=nullptr;
-        if(type=="book")
+        if(type=="book"){
+                if(item["isbn"].is_null()||!item["isbn"].is_string()) std::exit(1);
                 cite=new Book(id,book,item["isbn"].get<std::string>());
-        else if(type=="webpage")
+                }
+        else if(type=="webpage"){
+                if(item["url"].is_null()||!item["url"].is_string()) std::exit(1);
                 cite=new Webpage(id,webpage,item["url"].get<std::string>());
+                }
         else if(type=="article"){
+            if(item["author"].is_null()||!item["author"].is_string())std::exit(1);
             auto author=item["author"].get<std::string>();
+
+            if(item["title"].is_null()||!item["title"].is_string())std::exit(1);
             auto title=item["title"].get<std::string>();
+
+            if(item["journal"].is_null()||!item["journal"].is_string())std::exit(1);
             auto journal=item["journal"].get<std::string>();
+
+            if(item["year"].is_null()||!item["year"].is_number_integer())std::exit(1);
             auto year=std::to_string(item["year"].get<int>());
+
+            if(item["volume"].is_null()||!item["volume"].is_number_integer())std::exit(1);
             auto volume=std::to_string(item["volume"].get<int>());
+
+            if(item["issue"].is_null()||!item["issue"].is_number_integer())std::exit(1);
             auto issue=std::to_string(item["issue"].get<int>());
+            
             cite=new Article(id,article,author,title,journal,year,volume,issue);
         }
         c.push_back(cite);
