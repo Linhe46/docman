@@ -52,6 +52,7 @@ std::vector<Citation *>& citations){
     bool flag=0;
     while(input_stream.get(x)){
         if(x=='['){
+            if(flag) std::exit(1);//左括号未闭合
             flag=1;
             id="";
             continue;
@@ -69,10 +70,18 @@ std::vector<Citation *>& citations){
     if(flag==1)
         std::exit(1);//无匹配的右括号
     std::sort(idxes.begin(),idxes.end());
-    for(auto i:idxes)
-        for(auto cite:citations)
-            if(cite->id==i)
-                c.push_back(cite);
+    for(auto i:idxes){
+        bool searched=0;
+        for(auto cite:citations){
+            if(cite->id==i){
+                if(find(c.begin(),c.end(),cite)==c.end())
+                    c.push_back(cite);
+                searched=1;
+                break;}
+        }
+        if(!searched)
+            std::exit(1);
+    }
 }
 int main(int argc, char **argv)
 {
@@ -139,3 +148,4 @@ int main(int argc, char **argv)
 //./main -c source.json article.txt
 //g++ main.cpp -o main -lws2_32
 //./docman -c source.json article.txt
+
