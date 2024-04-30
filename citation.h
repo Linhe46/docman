@@ -23,7 +23,7 @@ public:
     Citation() {}
     Citation(std::string id_, Type type_) : id(id_), type(type_) {}
     virtual void get()=0;
-    virtual void printCitation()=0;
+    virtual void printCitation(std::ostream&)=0;
 };
 
 class Book : public Citation{
@@ -45,8 +45,8 @@ public:
             std::cerr<<"HTTP error: "<<httplib::to_string(err)<<std::endl;
         }
     }
-    void printCitation() override{
-        std::cout<<'['<<id<<"] book: "<<author<<", "
+    void printCitation(std::ostream& out) override{
+        out<<'['<<id<<"] book: "<<author<<", "
         <<title<<", "<<publisher<<", "<<year<<"\n";
     }
 };
@@ -66,8 +66,8 @@ public:
             std::cerr<<"HTTP error: "<<httplib::to_string(err)<<std::endl;
         }
     }
-    void printCitation() override{
-        std::cout<<'['<<id<<"] webpage: "<<title<<". Available at "
+    void printCitation(std::ostream& out) override{
+        out<<'['<<id<<"] webpage: "<<title<<". Available at "
         <<url<<"\n";
     }
 };
@@ -81,8 +81,8 @@ public:
     void get()override{
         return;
     }
-    void printCitation() override{
-        std::cout<<'['<<id<<"] article: "<<author<<", "
+    void printCitation(std::ostream& out) override{
+        out<<'['<<id<<"] article: "<<author<<", "
         <<title<<", "<<journal<<", "<<year<<", "<<volume<<
         ", "<<issue<<"\n";
     }

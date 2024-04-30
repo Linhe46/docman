@@ -77,11 +77,26 @@ std::vector<Citation *>& citations){
 int main(int argc, char **argv)
 {
     // "docman", "-c", "citations.json", "input.txt"
-    std::string citations_path,input_path,input;
+    std::string citations_path,input_path,input,output_path;
+    bool std_cout_flag=0;
     if(argc==4){
         citations_path=argv[2];
         input_path=argv[3];
+        std_cout_flag=1;
     }
+    else if(argc==6){
+        input_path=argv[5];
+        if(std::string(argv[1])=="-c"&&std::string(argv[3])=="-o"){
+            citations_path=argv[2];
+            output_path=argv[4];
+        }
+        else if(std::string(argv[1])=="-o"&&std::string(argv[3])=="-c"){
+            citations_path=argv[4];
+            output_path=argv[2];
+        }
+        else std::exit(1);
+    }
+
     if(input_path=="-")
         {   char c;
             input="";
@@ -100,7 +115,9 @@ int main(int argc, char **argv)
     
     output_idx(printedCitations,input,citations);
 
-    std::ostream &output = std::cout;
+    std::ofstream outFile;
+    if(!std_cout_flag) outFile.open(output_path);
+    std::ostream &output = std_cout_flag?std::cout:outFile;
 
     // output << input;  // print the paragraph first
     // output << "\nReferences:\n";
@@ -111,7 +128,7 @@ int main(int argc, char **argv)
     for (auto c : printedCitations)
     {
         // FIXME: print citation
-        c->printCitation();
+        c->printCitation(output);
     }
 
     for (auto c : citations)
