@@ -77,14 +77,27 @@ std::vector<Citation *>& citations){
 int main(int argc, char **argv)
 {
     // "docman", "-c", "citations.json", "input.txt"
-
-    auto citations = loadCitations(argv[2]);
+    std::string citations_path,input_path,input;
+    if(argc==4){
+        citations_path=argv[2];
+        input_path=argv[3];
+    }
+    if(input_path=="-")
+        {   char c;
+            input="";
+            while(std::cin.get(c)){
+                input+=c;
+        }
+        input.pop_back();
+        }
+    else input=readFromFile(input_path);
+    auto citations = loadCitations(citations_path);
     std::vector<Citation *> printedCitations{};
 
     // FIXME: read all input to the string, and process citations in the input text
     // auto input = readFromFile(argv[3]);
     // ...
-    auto input=readFromFile(argv[3]);
+    
     output_idx(printedCitations,input,citations);
 
     std::ostream &output = std::cout;
@@ -92,7 +105,8 @@ int main(int argc, char **argv)
     // output << input;  // print the paragraph first
     // output << "\nReferences:\n";
     output<<input<<"\n";
-    output<<"\nReferences:\n";
+    output<<"\n";
+    output<<"References:\n";
 
     for (auto c : printedCitations)
     {
@@ -107,3 +121,4 @@ int main(int argc, char **argv)
 }
 //./main -c source.json article.txt
 //g++ main.cpp -o main -lws2_32
+//./docman -c source.json article.txt
