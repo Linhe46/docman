@@ -12,6 +12,8 @@ std::vector<Citation *> loadCitations(const std::string &filename)
     // FIXME: load citations from file
     std::vector<Citation*>c;
     std::ifstream file{filename};
+    if(!file.is_open())
+        std::exit(1);
     nlohmann::json data;
     try {
         data = nlohmann::json::parse(file);
