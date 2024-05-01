@@ -129,12 +129,12 @@ int main(int argc, char **argv)
     if(input_path=="-")
         {   char c;
             input="";
-            while(std::cin.get(c)){
+            while(std::cin.get(c))
                 input+=c;
-        }
-        input.pop_back();
+        //input.pop_back();
         }
     else input=readFromFile(input_path);
+    
     auto citations = loadCitations(citations_path);
     std::vector<Citation *> printedCitations{};
 
@@ -168,4 +168,3 @@ int main(int argc, char **argv)
 //./main -c source.json article.txt
 //g++ main.cpp -o main -lws2_32
 //./docman -c source.json article.txt
-
