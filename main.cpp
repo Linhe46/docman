@@ -130,6 +130,7 @@ int main(int argc, char **argv)
         }
         else std::exit(1);
     }
+    else std::exit(1);
 
     if(input_path=="-")
         {   char c;
