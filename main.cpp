@@ -5,38 +5,42 @@
 
 #include "citation.h"
 #include "utils.hpp"
-
 #include "third_parties/nlohmann/json.hpp"
+
 std::vector<Citation *> loadCitations(const std::string &filename)
 {
     // FIXME: load citations from file
     std::vector<Citation*>c;
     std::ifstream file{filename};
-    if(!file.is_open())
+    if(!file.is_open())//文献文件不存在，退出
         std::exit(1);
     nlohmann::json data;
     try {
         data = nlohmann::json::parse(file);
-    } catch (nlohmann::json::parse_error& e) {
+    } catch (nlohmann::json::parse_error& e) {//解析出错，退出
         std::exit(1);
     }
+    //检测文献各字段是否正常，获取文献信息
     if(data["citations"].is_null())
         std::exit(1);
     for(auto& item:data["citations"]){
         if(item["id"].is_null()||!item["id"].is_string())std::exit(1);
         auto id=item["id"].get<std::string>();
+
         if(item["type"].is_null()||!item["type"].is_string())std::exit(1);
         auto type=item["type"].get<std::string>();
 
         Citation* cite=nullptr;
         if(type=="book"){
-                if(item["isbn"].is_null()||!item["isbn"].is_string()) std::exit(1);
-                cite=new Book(id,book,item["isbn"].get<std::string>());
-                }
+            if(item["isbn"].is_null()||!item["isbn"].is_string()) std::exit(1);
+
+            cite=new Book(id,book,item["isbn"].get<std::string>());
+            }
         else if(type=="webpage"){
-                if(item["url"].is_null()||!item["url"].is_string()) std::exit(1);
-                cite=new Webpage(id,webpage,item["url"].get<std::string>());
-                }
+            if(item["url"].is_null()||!item["url"].is_string()) std::exit(1);
+
+            cite=new Webpage(id,webpage,item["url"].get<std::string>());
+            }
         else if(type=="article"){
             if(item["author"].is_null()||!item["author"].is_string())std::exit(1);
             auto author=item["author"].get<std::string>();
@@ -64,7 +68,7 @@ std::vector<Citation *> loadCitations(const std::string &filename)
 }
 std::string readFromFile(const std::string& filename){
     std::ifstream file(filename);
-    if(!file.is_open())
+    if(!file.is_open())//input文件不存在，退出
         std::exit(1);
     std::string s;
     char x;
@@ -73,12 +77,12 @@ std::string readFromFile(const std::string& filename){
     return s;
 }
 void output_idx(std::vector<Citation*>&c,const std::string& input,const
-std::vector<Citation *>& citations){
+std::vector<Citation *>& citations){//获取输出序列
     std::vector<std::string>idxes;
     char x;
     std::string id;
     std::istringstream input_stream(input);
-    bool flag=0;
+    bool flag=0;//标志括号合法性
     while(input_stream.get(x)){
         if(x=='['){
             if(flag) std::exit(1);//左括号未闭合
@@ -98,7 +102,8 @@ std::vector<Citation *>& citations){
     }
     if(flag==1)
         std::exit(1);//无匹配的右括号
-    std::sort(idxes.begin(),idxes.end());
+
+    std::sort(idxes.begin(),idxes.end());//按id排序
     for(auto i:idxes){
         bool searched=0;
         for(auto cite:citations){
@@ -108,7 +113,7 @@ std::vector<Citation *>& citations){
                 searched=1;
                 break;}
         }
-        if(!searched)
+        if(!searched)//合集中不包含此id，退出
             std::exit(1);
     }
 }
@@ -116,7 +121,7 @@ int main(int argc, char **argv)
 {
     // "docman", "-c", "citations.json", "input.txt"
     std::string citations_path,input_path,input,output_path;
-    bool std_cout_flag=0;
+    bool std_cout_flag=0;//标志是否从标准输入输出
     if(argc==4){
         citations_path=argv[2];
         input_path=argv[3];
@@ -134,7 +139,7 @@ int main(int argc, char **argv)
         }
         else std::exit(1);
     }
-    else std::exit(1);
+    else std::exit(1);//非法输入格式，退出
 
     if(input_path=="-")
         {   char c;
